@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting | CampusNet Digital Twin</title>
+  <script src="auth.js"></script>
+  <script>
+    const user = DemoAuth.getCurrentUser();
+    if (user) {
+      window.location.replace('dashboard.html');
+    } else {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #f8fafc; color: #475569;">
+  <p>Loading CampusNet Wireless Digital Twin Management System...</p>
+</body>
+</html>

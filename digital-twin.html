@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - Interactive Vector Campus Map Simulation">
+  <title>Digital Twin Map | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item active">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">SJ</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Dr. Sarah Jenkins</div>
+            <div class="user-role-badge" id="user-profile-role">Administrator</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Campus Digital Twin</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+
+          <!-- Quick Simulation Controls in Header -->
+          <div style="display: flex; gap: 6px;">
+            <button id="btn-start" class="btn btn-primary btn-sm">▶ Start</button>
+            <button id="btn-pause" class="btn btn-secondary btn-sm">⏸ Pause</button>
+            <button id="btn-step" class="btn btn-secondary btn-sm">⏭ Step</button>
+            <button id="btn-reset" class="btn btn-secondary btn-sm">↺ Reset</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Campus Digital Twin Viewport</h1>
+            <p>Interactive 900 × 550 vector simulation model displaying wireless coverage, crowd displacement, and load distribution.</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="sim-state-text" style="font-size: 0.82rem; font-weight: 600; color: var(--color-primary); background: var(--color-primary-subtle); padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid #bfdbfe;">
+              Paused (Ready)
+            </span>
+          </div>
+        </div>
+
+        <!-- 2-Column Layout: Left Large Map (68%) + Right Side Panel (32%) -->
+        <div class="map-view-grid">
+          <!-- Left Column: Interactive Campus Map Viewport -->
+          <section class="card" style="display: flex; flex-direction: column;">
+            <div class="card-header">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 class="card-title">Virtual Campus Map</h2>
+                <span class="badge badge-subtle">900 × 550 Coordinate Space</span>
+              </div>
+
+              <!-- Layer Toggles -->
+              <div class="map-toolbar" role="toolbar" aria-label="Map Layer Toggles">
+                <label class="toggle-btn" title="Toggle Wi-Fi coverage zones">
+                  <input type="checkbox" id="toggle-coverage" checked>
+                  <span class="toggle-switch"></span>
+                  <span>Coverage</span>
+                </label>
+                <label class="toggle-btn" title="Toggle building name tags">
+                  <input type="checkbox" id="toggle-labels" checked>
+                  <span class="toggle-switch"></span>
+                  <span>Labels</span>
+                </label>
+                <label class="toggle-btn" title="Toggle range boundary rings">
+                  <input type="checkbox" id="toggle-rings" checked>
+                  <span class="toggle-switch"></span>
+                  <span>Rings</span>
+                </label>
+                <label class="toggle-btn" title="Toggle client nodes">
+                  <input type="checkbox" id="toggle-users" checked>
+                  <span class="toggle-switch"></span>
+                  <span>Users</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- SVG Map Viewport -->
+            <div class="svg-map-wrapper">
+              <svg id="campus-svg" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Campus Network Vector Map">
+                <defs>
+                  <!-- Ground Gradient -->
+                  <radialGradient id="campus-ground-grad" cx="50%" cy="50%" r="70%">
+                    <stop offset="0%" stop-color="#f8fafc" />
+                    <stop offset="100%" stop-color="#f1f5f9" />
+                  </radialGradient>
+
+                  <!-- Signal Zones (Strong <= 110, Medium <= 210, Weak <= 300) -->
+                  <radialGradient id="ap-zone-green" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.28" />
+                    <stop offset="65%" stop-color="#10b981" stop-opacity="0.12" />
+                    <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
+                  </radialGradient>
+
+                  <radialGradient id="ap-zone-amber" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.22" />
+                    <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.08" />
+                    <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0" />
+                  </radialGradient>
+
+                  <radialGradient id="ap-zone-red" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.16" />
+                    <stop offset="75%" stop-color="#ef4444" stop-opacity="0.05" />
+                    <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0" />
+                  </radialGradient>
+
+                  <radialGradient id="fountain-grad" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+                    <stop offset="70%" stop-color="#0284c7" stop-opacity="0.8" />
+                    <stop offset="100%" stop-color="#0369a1" stop-opacity="0.5" />
+                  </radialGradient>
+
+                  <filter id="building-shadow" x="-5%" y="-5%" width="115%" height="115%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.08" />
+                  </filter>
+                </defs>
+
+                <!-- Ground Layer -->
+                <rect class="campus-ground" x="0" y="0" width="900" height="550" rx="14" fill="url(#campus-ground-grad)" />
+
+                <!-- Campus Lawns & Quads -->
+                <g class="campus-lawns" aria-hidden="true">
+                  <rect x="320" y="75" width="180" height="105" rx="12" class="lawn-patch" />
+                  <rect x="320" y="365" width="180" height="115" rx="12" class="lawn-patch" />
+                  <circle cx="450" cy="275" r="100" class="lawn-circle" />
+                </g>
+
+                <!-- Pathways & Walkways -->
+                <g class="campus-pathways" aria-hidden="true">
+                  <path d="M 0 275 L 900 275" class="pathway-main" />
+                  <path d="M 450 0 L 450 550" class="pathway-main" />
+                  <path d="M 220 180 L 370 240" class="pathway-sub" />
+                  <path d="M 220 370 L 370 310" class="pathway-sub" />
+                  <path d="M 630 170 L 530 240" class="pathway-sub" />
+                  <path d="M 630 380 L 530 310" class="pathway-sub" />
+                  <circle cx="450" cy="275" r="70" class="pathway-ring" />
+                </g>
+
+                <!-- Central Plaza & Fountain -->
+                <g class="campus-plaza" id="central-plaza">
+                  <circle cx="450" cy="275" r="40" class="plaza-pavement" />
+                  <circle cx="450" cy="275" r="22" fill="url(#fountain-grad)" class="plaza-fountain" />
+                  <circle cx="450" cy="275" r="8" fill="#ffffff" opacity="0.8" />
+                  <text x="450" y="263" class="plaza-label" text-anchor="middle">Central Plaza</text>
+                </g>
+
+                <!-- Signal Coverage Layer -->
+                <g id="layer-coverage" class="layer-coverage">
+                  <g class="ap-coverage-group" id="cov-ap-01" data-ap="AP-01">
+                    <circle cx="180" cy="150" r="300" fill="url(#ap-zone-red)" class="zone-weak" />
+                    <circle cx="180" cy="150" r="210" fill="url(#ap-zone-amber)" class="zone-medium" />
+                    <circle cx="180" cy="150" r="110" fill="url(#ap-zone-green)" class="zone-strong" />
+                  </g>
+                  <g class="ap-coverage-group" id="cov-ap-02" data-ap="AP-02">
+                    <circle cx="680" cy="130" r="300" fill="url(#ap-zone-red)" class="zone-weak" />
+                    <circle cx="680" cy="130" r="210" fill="url(#ap-zone-amber)" class="zone-medium" />
+                    <circle cx="680" cy="130" r="110" fill="url(#ap-zone-green)" class="zone-strong" />
+                  </g>
+                  <g class="ap-coverage-group" id="cov-ap-03" data-ap="AP-03">
+                    <circle cx="690" cy="410" r="300" fill="url(#ap-zone-red)" class="zone-weak" />
+                    <circle cx="690" cy="410" r="210" fill="url(#ap-zone-amber)" class="zone-medium" />
+                    <circle cx="690" cy="410" r="110" fill="url(#ap-zone-green)" class="zone-strong" />
+                  </g>
+                  <g class="ap-coverage-group" id="cov-ap-04" data-ap="AP-04">
+                    <circle cx="190" cy="410" r="300" fill="url(#ap-zone-red)" class="zone-weak" />
+                    <circle cx="190" cy="410" r="210" fill="url(#ap-zone-amber)" class="zone-medium" />
+                    <circle cx="190" cy="410" r="110" fill="url(#ap-zone-green)" class="zone-strong" />
+                  </g>
+                </g>
+
+                <!-- Range Boundary Rings Layer -->
+                <g id="layer-rings" class="layer-rings">
+                  <circle cx="180" cy="150" r="110" class="ring-strong" />
+                  <circle cx="180" cy="150" r="210" class="ring-medium" />
+                  <circle cx="680" cy="130" r="110" class="ring-strong" />
+                  <circle cx="680" cy="130" r="210" class="ring-medium" />
+                  <circle cx="690" cy="410" r="110" class="ring-strong" />
+                  <circle cx="690" cy="410" r="210" class="ring-medium" />
+                  <circle cx="190" cy="410" r="110" class="ring-strong" />
+                  <circle cx="190" cy="410" r="210" class="ring-medium" />
+                </g>
+
+                <!-- Buildings Layer -->
+                <g class="campus-buildings" id="layer-buildings" filter="url(#building-shadow)">
+                  <!-- 1: Academic Block -->
+                  <g class="building-group" id="bldg-academic">
+                    <rect x="70" y="60" width="220" height="175" rx="8" class="bldg-body bldg-academic-color" />
+                    <rect x="80" y="70" width="95" height="70" rx="4" class="bldg-roof-feature" />
+                    <rect x="185" y="70" width="95" height="70" rx="4" class="bldg-roof-feature" />
+                    <rect x="80" y="150" width="200" height="70" rx="4" class="bldg-roof-feature" />
+                    <rect x="160" y="230" width="40" height="10" class="bldg-entrance" />
+                  </g>
+                  <!-- 2: Central Library -->
+                  <g class="building-group" id="bldg-library">
+                    <rect x="560" y="50" width="240" height="165" rx="8" class="bldg-body bldg-library-color" />
+                    <circle cx="680" cy="130" r="42" class="bldg-rotunda" />
+                    <rect x="575" y="62" width="65" height="138" rx="4" class="bldg-roof-feature" />
+                    <rect x="725" y="62" width="65" height="138" rx="4" class="bldg-roof-feature" />
+                    <rect x="660" y="210" width="40" height="10" class="bldg-entrance" />
+                  </g>
+                  <!-- 3: Student Commons -->
+                  <g class="building-group" id="bldg-commons">
+                    <rect x="570" y="325" width="240" height="175" rx="8" class="bldg-body bldg-commons-color" />
+                    <rect x="585" y="338" width="210" height="75" rx="4" class="bldg-roof-feature" />
+                    <rect x="585" y="422" width="100" height="65" rx="4" class="bldg-roof-feature" />
+                    <rect x="695" y="422" width="100" height="65" rx="4" class="bldg-roof-feature" />
+                    <rect x="665" y="320" width="45" height="10" class="bldg-entrance" />
+                  </g>
+                  <!-- 4: Science Wing -->
+                  <g class="building-group" id="bldg-science">
+                    <rect x="75" y="325" width="230" height="175" rx="8" class="bldg-body bldg-science-color" />
+                    <rect x="88" y="338" width="100" height="68" rx="4" class="bldg-roof-feature" />
+                    <rect x="195" y="338" width="98" height="68" rx="4" class="bldg-roof-feature" />
+                    <rect x="88" y="416" width="205" height="70" rx="4" class="bldg-roof-feature" />
+                    <rect x="170" y="320" width="40" height="10" class="bldg-entrance" />
+                  </g>
+                  <!-- 5: Admin Hall -->
+                  <g class="building-group" id="bldg-admin">
+                    <rect x="370" y="70" width="160" height="90" rx="6" class="bldg-body bldg-admin-color" />
+                    <rect x="385" y="82" width="130" height="65" rx="3" class="bldg-roof-feature" />
+                    <circle cx="450" cy="115" r="12" class="bldg-clocktower" />
+                    <rect x="435" y="155" width="30" height="8" class="bldg-entrance" />
+                  </g>
+                </g>
+
+                <!-- Labels Layer -->
+                <g id="layer-labels" class="layer-labels">
+                  <text x="180" y="105" class="label-bldg-title" text-anchor="middle">Academic Block A</text>
+                  <text x="180" y="121" class="label-bldg-code" text-anchor="middle">Classrooms &amp; Lecture Halls</text>
+
+                  <text x="680" y="98" class="label-bldg-title" text-anchor="middle">Central Library</text>
+                  <text x="680" y="114" class="label-bldg-code" text-anchor="middle">Study Areas &amp; Media Stacks</text>
+
+                  <text x="690" y="370" class="label-bldg-title" text-anchor="middle">Student Commons</text>
+                  <text x="690" y="386" class="label-bldg-code" text-anchor="middle">Dining &amp; Social Quad</text>
+
+                  <text x="190" y="370" class="label-bldg-title" text-anchor="middle">Science &amp; Tech Wing</text>
+                  <text x="190" y="386" class="label-bldg-code" text-anchor="middle">Engineering &amp; IT Labs</text>
+
+                  <text x="450" y="118" class="label-bldg-title" text-anchor="middle">Admin &amp; Hall</text>
+                </g>
+
+                <!-- AP Beacons Layer -->
+                <g id="layer-aps" class="layer-aps">
+                  <!-- AP-01 -->
+                  <g class="ap-marker active" id="marker-ap-01" transform="translate(180, 150)" data-id="AP-01" tabindex="0">
+                    <circle cx="0" cy="0" r="16" class="ap-radar-pulse" />
+                    <circle cx="0" cy="0" r="10" class="ap-pin-outer" />
+                    <circle cx="0" cy="0" r="5" class="ap-pin-inner" />
+                    <g class="ap-badge-tag" transform="translate(0, -18)">
+                      <rect x="-26" y="-12" width="52" height="15" rx="3" class="ap-tag-bg" />
+                      <text x="0" y="-2" text-anchor="middle" class="ap-tag-text">AP-01</text>
+                    </g>
+                  </g>
+                  <!-- AP-02 -->
+                  <g class="ap-marker active" id="marker-ap-02" transform="translate(680, 130)" data-id="AP-02" tabindex="0">
+                    <circle cx="0" cy="0" r="16" class="ap-radar-pulse" />
+                    <circle cx="0" cy="0" r="10" class="ap-pin-outer" />
+                    <circle cx="0" cy="0" r="5" class="ap-pin-inner" />
+                    <g class="ap-badge-tag" transform="translate(0, -18)">
+                      <rect x="-26" y="-12" width="52" height="15" rx="3" class="ap-tag-bg" />
+                      <text x="0" y="-2" text-anchor="middle" class="ap-tag-text">AP-02</text>
+                    </g>
+                  </g>
+                  <!-- AP-03 -->
+                  <g class="ap-marker active" id="marker-ap-03" transform="translate(690, 410)" data-id="AP-03" tabindex="0">
+                    <circle cx="0" cy="0" r="16" class="ap-radar-pulse" />
+                    <circle cx="0" cy="0" r="10" class="ap-pin-outer" />
+                    <circle cx="0" cy="0" r="5" class="ap-pin-inner" />
+                    <g class="ap-badge-tag" transform="translate(0, -18)">
+                      <rect x="-26" y="-12" width="52" height="15" rx="3" class="ap-tag-bg" />
+                      <text x="0" y="-2" text-anchor="middle" class="ap-tag-text">AP-03</text>
+                    </g>
+                  </g>
+                  <!-- AP-04 -->
+                  <g class="ap-marker active" id="marker-ap-04" transform="translate(190, 410)" data-id="AP-04" tabindex="0">
+                    <circle cx="0" cy="0" r="16" class="ap-radar-pulse" />
+                    <circle cx="0" cy="0" r="10" class="ap-pin-outer" />
+                    <circle cx="0" cy="0" r="5" class="ap-pin-inner" />
+                    <g class="ap-badge-tag" transform="translate(0, -18)">
+                      <rect x="-26" y="-12" width="52" height="15" rx="3" class="ap-tag-bg" />
+                      <text x="0" y="-2" text-anchor="middle" class="ap-tag-text">AP-04</text>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- Users Container Layer -->
+                <g id="layer-users" class="layer-users"></g>
+              </svg>
+
+              <!-- Map Legend -->
+              <div class="map-legend">
+                <div class="legend-header">Map Legend</div>
+                <div class="legend-grid">
+                  <div class="legend-item">
+                    <span class="legend-color-chip chip-strong"></span>
+                    <span><strong>Strong:</strong> &le; 110 units</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color-chip chip-medium"></span>
+                    <span><strong>Medium:</strong> 111–210 units</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color-chip chip-weak"></span>
+                    <span><strong>Weak:</strong> &gt; 210 units</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-icon-ap">📡</span>
+                    <span><strong>AP Node:</strong> Wi-Fi Beacon</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Right Column: Controls & Access Point Monitor -->
+          <aside style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Simulation Controls Card -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Crowd &amp; Population Controls</h3>
+                <span class="badge badge-live">Live Slider</span>
+              </div>
+              <div class="card-body">
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label for="user-population-slider" class="form-label" style="margin: 0;">Active Campus Population</label>
+                    <span id="slider-user-count" class="badge" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; font-size:0.8rem; font-weight:700;">48 users</span>
+                  </div>
+                  <input type="range" id="user-population-slider" min="0" max="150" value="48" step="1" class="range-slider">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+                    <span>0 (Idle)</span>
+                    <span>65 (Nominal)</span>
+                    <span>150 (Overloaded)</span>
+                  </div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border-light); padding: 10px 12px; border-radius: var(--radius-md); font-size: 0.75rem; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary);">Model:</span>
+                    <code>Euclidean (900 × 550)</code>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary);">Thresholds:</span>
+                    <span>Normal &lt;70% | Congested &ge;90%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Access Point Fleet Monitor Cards -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Access Point Monitor</h3>
+                <a href="access-points.html" style="font-size: 0.72rem; color: var(--color-primary); font-weight: 600;">Manage Table ➔</a>
+              </div>
+              <div class="card-body" style="padding: 12px;">
+                <div class="ap-list" id="twin-ap-cards-container">
+                  <!-- Dynamically rendered AP cards with power toggle -->
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    DemoAuth.requireAuth();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = DemoAuth.getCurrentUser();
+      if (user) {
+        const nameEl = document.getElementById('user-profile-name');
+        const roleEl = document.getElementById('user-profile-role');
+        const avatarEl = document.getElementById('user-profile-avatar');
+        if (nameEl) nameEl.textContent = user.name;
+        if (roleEl) roleEl.textContent = user.role;
+        if (avatarEl) avatarEl.textContent = user.avatar;
+      }
+
+      document.getElementById('btn-logout')?.addEventListener('click', () => {
+        DemoAuth.logout();
+      });
+
+      let animTimer = null;
+      let isLocalRunning = false;
+
+      const usersContainer = document.getElementById('layer-users');
+      const apCardsContainer = document.getElementById('twin-ap-cards-container');
+      const simStateText = document.getElementById('sim-state-text');
+      const slider = document.getElementById('user-population-slider');
+      const sliderCountBadge = document.getElementById('slider-user-count');
+
+      const btnStart = document.getElementById('btn-start');
+      const btnPause = document.getElementById('btn-pause');
+      const btnStep = document.getElementById('btn-step');
+      const btnReset = document.getElementById('btn-reset');
+
+      // 1. Render Access Point Monitor Cards
+      function renderApCards() {
+        if (!apCardsContainer) return;
+        const state = CampusState.getState();
+        apCardsContainer.innerHTML = '';
+
+        state.accessPoints.forEach(ap => {
+          const card = document.createElement('article');
+          card.className = `ap-card status-${ap.status}`;
+          card.id = `card-${ap.id.toLowerCase()}`;
+
+          let pillClass = 'pill-normal';
+          let pillText = 'Normal';
+          if (!ap.enabled) { pillClass = 'pill-disabled'; pillText = 'Disabled'; }
+          else if (ap.status === 'danger') { pillClass = 'pill-danger'; pillText = 'Congested'; }
+          else if (ap.status === 'warning') { pillClass = 'pill-warning'; pillText = 'High Load'; }
+
+          const visualWidth = ap.enabled ? Math.min(ap.loadPercentage, 100).toFixed(1) : 0;
+          const displayLoad = ap.enabled ? `${ap.loadPercentage.toFixed(1)}%` : 'OFF';
+
+          card.innerHTML = `
+            <div class="ap-card-top">
+              <div class="ap-card-identity">
+                <span class="ap-id-badge ${!ap.enabled ? 'badge-disabled' : (ap.status === 'danger' ? 'badge-danger' : (ap.status === 'warning' ? 'badge-warning' : ''))}">${ap.id}</span>
+                <div class="ap-name-group">
+                  <h4 class="ap-name" style="font-size: 0.85rem;">${ap.name}</h4>
+                  <span class="ap-location">${ap.location}</span>
+                </div>
+              </div>
+              <div class="ap-actions">
+                <button class="btn-ap-toggle ${ap.enabled ? 'btn-ap-on' : 'btn-ap-off'}" data-toggle-ap="${ap.id}">
+                  ${ap.enabled ? 'Disable' : 'Enable'}
+                </button>
+                <span class="status-pill ${pillClass}" style="font-size: 0.65rem; padding: 1px 7px;">${pillText}</span>
+              </div>
+            </div>
+            <div class="ap-metric-row">
+              <span class="metric-label">Users: <strong>${ap.connectedUsers}</strong> / ${ap.capacity}</span>
+              <span class="metric-value">Load: <strong>${displayLoad}</strong></span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill ${!ap.enabled ? '' : (ap.status === 'danger' ? 'fill-danger' : (ap.status === 'warning' ? 'fill-warning' : 'fill-normal'))}" style="width: ${visualWidth}%;"></div>
+            </div>
+          `;
+          apCardsContainer.appendChild(card);
+        });
+
+        // Attach toggle handlers
+        apCardsContainer.querySelectorAll('[data-toggle-ap]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            CampusState.toggleAp(btn.getAttribute('data-toggle-ap'));
+            renderAll();
+          });
+        });
+      }
+
+      // 2. Render SVG User Nodes
+      function renderUsers() {
+        if (!usersContainer) return;
+        const state = CampusState.getState();
+        usersContainer.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
+        state.users.forEach(u => {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', u.x.toFixed(1));
+          circle.setAttribute('cy', u.y.toFixed(1));
+          circle.setAttribute('r', '4');
+          circle.setAttribute('class', `user-dot user-dot-${u.signalCategory}`);
+
+          const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+          title.textContent = `Client: ${u.id}\nServing: ${u.assignedApId || 'None'}\nDistance: ${u.distance} units\nSignal: ${u.signalCategory.toUpperCase()}`;
+          circle.appendChild(title);
+
+          fragment.appendChild(circle);
+        });
+
+        usersContainer.appendChild(fragment);
+      }
+
+      // 3. Update AP Beacons and Coverage visibility
+      function updateMapBeacons() {
+        const state = CampusState.getState();
+        state.accessPoints.forEach(ap => {
+          const marker = document.getElementById(`marker-${ap.id.toLowerCase()}`);
+          const cov = document.getElementById(`cov-${ap.id.toLowerCase()}`);
+
+          if (marker) {
+            marker.classList.remove('active', 'warning', 'danger', 'disabled');
+            if (!ap.enabled) {
+              marker.classList.add('disabled');
+            } else {
+              marker.classList.add(ap.status === 'danger' ? 'danger' : (ap.status === 'warning' ? 'warning' : 'active'));
+            }
+          }
+
+          if (cov) {
+            cov.classList.toggle('is-disabled', !ap.enabled);
+          }
+        });
+      }
+
+      function renderAll() {
+        const state = CampusState.getState();
+        slider.value = state.users.length;
+        const dangerAlerts = state.alerts.filter(a => a.type === 'danger').length;
+        const navAlertCounter = document.getElementById('nav-alert-counter');
+        if (navAlertCounter) {
+          navAlertCounter.textContent = dangerAlerts;
+          navAlertCounter.style.display = dangerAlerts > 0 ? 'inline-block' : 'none';
+        }
+
+        renderApCards();
+        renderUsers();
+        updateMapBeacons();
+      }
+
+      // Simulation Movement Controls
+      function startSim() {
+        if (isLocalRunning) return;
+        isLocalRunning = true;
+        btnStart.classList.add('btn-primary');
+        btnStart.classList.remove('btn-secondary');
+        btnPause.classList.remove('btn-primary');
+        btnPause.classList.add('btn-secondary');
+
+        simStateText.textContent = 'Active (Moving)';
+        simStateText.style.color = 'var(--color-normal)';
+
+        animTimer = setInterval(() => {
+          CampusState.stepPhysics();
+          renderUsers();
+          renderApCards();
+          updateMapBeacons();
+        }, 60);
+      }
+
+      function pauseSim() {
+        if (!isLocalRunning) return;
+        isLocalRunning = false;
+        clearInterval(animTimer);
+        animTimer = null;
+
+        btnPause.classList.add('btn-primary');
+        btnPause.classList.remove('btn-secondary');
+        btnStart.classList.remove('btn-primary');
+        btnStart.classList.add('btn-secondary');
+
+        simStateText.textContent = 'Paused';
+        simStateText.style.color = 'var(--color-warning)';
+      }
+
+      function stepSim() {
+        if (isLocalRunning) pauseSim();
+        CampusState.stepPhysics();
+        renderAll();
+        simStateText.textContent = 'Stepped (1 Frame)';
+      }
+
+      function resetSim() {
+        if (isLocalRunning) pauseSim();
+        CampusState.resetSimulation();
+        renderAll();
+        simStateText.textContent = 'Reset (Baseline)';
+      }
+
+      btnStart.addEventListener('click', startSim);
+      btnPause.addEventListener('click', pauseSim);
+      btnStep.addEventListener('click', stepSim);
+      btnReset.addEventListener('click', resetSim);
+
+      slider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        sliderCountBadge.textContent = `${val} users`;
+        CampusState.setPopulation(val);
+        renderAll();
+      });
+
+      // Layer Toggles
+      document.getElementById('toggle-coverage').addEventListener('change', (e) => {
+        document.getElementById('layer-coverage').classList.toggle('is-hidden', !e.target.checked);
+      });
+      document.getElementById('toggle-labels').addEventListener('change', (e) => {
+        document.getElementById('layer-labels').classList.toggle('is-hidden', !e.target.checked);
+      });
+      document.getElementById('toggle-rings').addEventListener('change', (e) => {
+        document.getElementById('layer-rings').classList.toggle('is-hidden', !e.target.checked);
+      });
+      document.getElementById('toggle-users').addEventListener('change', (e) => {
+        usersContainer.classList.toggle('is-hidden', !e.target.checked);
+      });
+
+      renderAll();
+      CampusState.subscribe(renderAll);
+    });
+  </script>
+</body>
+</html>

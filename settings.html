@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - System and Simulation Settings">
+  <title>System Settings | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .settings-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .settings-grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .settings-section-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .settings-section-header {
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 12px;
+    }
+    .settings-section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .settings-section-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+    .toggle-label-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    .toggle-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .toggle-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .checkbox-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .checkbox-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .25s;
+      border-radius: 24px;
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+    }
+    input:checked + .switch-slider {
+      background-color: var(--color-primary);
+    }
+    input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+    .status-alert-banner {
+      display: none;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .banner-success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .banner-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item active">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">AD</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Administrator</div>
+            <div class="user-role-badge" id="user-profile-role">Admin Access</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">System Settings</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+          <button id="btn-save-settings-top" class="btn btn-primary btn-sm">Save All Settings</button>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Simulation &amp; Application Settings</h1>
+            <p>Customize physics engine parameters, radio load thresholds, layer visibilities, and demo operator credentials.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-reset-defaults" class="btn btn-secondary btn-sm">Reset to Defaults</button>
+            <button id="btn-save-settings" class="btn btn-primary btn-sm">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Notification banner -->
+        <div id="save-status-banner" class="status-alert-banner"></div>
+
+        <!-- Settings Grid -->
+        <div class="settings-grid-layout">
+          <!-- 1. Simulation Physics & Population -->
+          <div class="settings-section-card">
+            <div class="settings-section-header">
+              <h2 class="settings-section-title">Engine Physics &amp; Population</h2>
+              <div class="settings-section-desc">Control simulated Brownian drift velocity and default baseline population.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="setting-speed">Movement Speed Multiplier</label>
+              <select id="setting-speed" class="form-select">
+                <option value="0.5">0.5x — Slow Gentle Drift</option>
+                <option value="1.0" selected>1.0x — Normal Academic Movement</option>
+                <option value="1.5">1.5x — Active Campus Passing Time</option>
+                <option value="2.0">2.0x — High Velocity Walk</option>
+                <option value="3.0">3.0x — Rapid Stress Test</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="setting-default-pop">Default Population on Reset (0 – 150)</label>
+              <input type="number" id="setting-default-pop" class="form-input" min="0" max="150" value="48">
+              <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Number of client devices seeded whenever the simulation is reset.</span>
+            </div>
+          </div>
+
+          <!-- 2. Alert & Capacity Thresholds -->
+          <div class="settings-section-card">
+            <div class="settings-section-header">
+              <h2 class="settings-section-title">Capacity &amp; Congestion Thresholds</h2>
+              <div class="settings-section-desc">Define utilization criteria for High Load (Warning) and Congested (Danger) states.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="setting-warning-threshold">High Load Warning Threshold (%)</label>
+              <input type="number" id="setting-warning-threshold" class="form-input" min="50" max="85" value="70">
+              <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Trigger advisory warnings when AP utilization exceeds this percentage (Default: 70%).</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="setting-danger-threshold">Congestion Danger Threshold (%)</label>
+              <input type="number" id="setting-danger-threshold" class="form-input" min="80" max="100" value="90">
+              <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Trigger critical alerts when AP utilization reaches or exceeds this percentage (Default: 90%).</span>
+            </div>
+          </div>
+
+          <!-- 3. Digital Twin Map Display Defaults -->
+          <div class="settings-section-card">
+            <div class="settings-section-header">
+              <h2 class="settings-section-title">Digital Twin Map Layer Defaults</h2>
+              <div class="settings-section-desc">Configure which SVG map layers are rendered by default.</div>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-label-wrap">
+                <span class="toggle-title">Signal Coverage Heatmap Circles</span>
+                <span class="toggle-desc">Radial coverage gradients around operational APs</span>
+              </div>
+              <label class="checkbox-switch">
+                <input type="checkbox" id="setting-layer-coverage" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-label-wrap">
+                <span class="toggle-title">Campus Building Labels</span>
+                <span class="toggle-desc">Architectural name plaques on campus facilities</span>
+              </div>
+              <label class="checkbox-switch">
+                <input type="checkbox" id="setting-layer-labels" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-label-wrap">
+                <span class="toggle-title">Signal Distance Range Rings</span>
+                <span class="toggle-desc">Dashed circles at 110 (Strong) and 210 (Medium) units</span>
+              </div>
+              <label class="checkbox-switch">
+                <input type="checkbox" id="setting-layer-rings" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-label-wrap">
+                <span class="toggle-title">Simulated Client Markers</span>
+                <span class="toggle-desc">Coloured dots representing active mobile nodes</span>
+              </div>
+              <label class="checkbox-switch">
+                <input type="checkbox" id="setting-layer-users" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Demo Profile & Operator Credentials -->
+          <div class="settings-section-card">
+            <div class="settings-section-header">
+              <h2 class="settings-section-title">Active Operator Session</h2>
+              <div class="settings-section-desc">Client-side demo authentication details and security sign-out.</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px; padding: 12px; background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+              <div class="user-avatar" style="width: 48px; height: 48px; font-size: 1.1rem;" id="settings-user-avatar">AD</div>
+              <div>
+                <strong style="font-size: 0.95rem; color: var(--text-main);" id="settings-user-name">Administrator</strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);" id="settings-user-email">admin@campus.edu</div>
+                <div style="margin-top: 4px;"><span class="status-pill pill-normal" id="settings-user-role-badge">Administrator Role</span></div>
+              </div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Security Disclosure:</strong> This application utilizes browser-side demo authentication for academic demonstration. No backend server session or confidential database is accessed.
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: auto;">
+              <button id="btn-settings-logout" class="btn btn-danger btn-sm" style="flex: 1; justify-content: center;">Sign Out of Demo Session</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce authentication
+      const user = DemoAuth.requireAuth();
+      if (!user) return;
+
+      // Populate user profile
+      const nameEl = document.getElementById('user-profile-name');
+      const roleEl = document.getElementById('user-profile-role');
+      const avatarEl = document.getElementById('user-profile-avatar');
+      if (nameEl) nameEl.textContent = user.name;
+      if (roleEl) roleEl.textContent = user.role;
+      if (avatarEl) avatarEl.textContent = user.avatar;
+
+      // Populate settings card profile
+      document.getElementById('settings-user-name').textContent = user.name;
+      document.getElementById('settings-user-email').textContent = user.email;
+      document.getElementById('settings-user-avatar').textContent = user.avatar;
+      document.getElementById('settings-user-role-badge').textContent = `${user.role} Access`;
+
+      // Logout handler
+      const handleLogout = () => DemoAuth.logout();
+      document.getElementById('btn-logout')?.addEventListener('click', handleLogout);
+      document.getElementById('btn-settings-logout')?.addEventListener('click', handleLogout);
+
+      // Elements
+      const speedSelect = document.getElementById('setting-speed');
+      const defaultPopInput = document.getElementById('setting-default-pop');
+      const warningInput = document.getElementById('setting-warning-threshold');
+      const dangerInput = document.getElementById('setting-danger-threshold');
+      const layerCoverage = document.getElementById('setting-layer-coverage');
+      const layerLabels = document.getElementById('setting-layer-labels');
+      const layerRings = document.getElementById('setting-layer-rings');
+      const layerUsers = document.getElementById('setting-layer-users');
+      const banner = document.getElementById('save-status-banner');
+
+      function loadCurrentSettings() {
+        const state = CampusState.getState();
+        const settings = state.settings || {};
+
+        if (speedSelect) speedSelect.value = (settings.movementSpeed || 1.0).toString();
+        if (defaultPopInput) defaultPopInput.value = settings.defaultPopulation !== undefined ? settings.defaultPopulation : 48;
+        if (warningInput) warningInput.value = settings.warningThreshold !== undefined ? settings.warningThreshold : 70;
+        if (dangerInput) dangerInput.value = settings.congestionThreshold !== undefined ? settings.congestionThreshold : 90;
+
+        if (layerCoverage) layerCoverage.checked = settings.showCoverage !== false;
+        if (layerLabels) layerLabels.checked = settings.showLabels !== false;
+        if (layerRings) layerRings.checked = settings.showRings !== false;
+        if (layerUsers) layerUsers.checked = settings.showUsers !== false;
+
+        // Update alert counter in sidebar
+        const alertCounter = document.getElementById('nav-alert-counter');
+        const activeAlerts = state.alerts.filter(a => a.type === 'danger').length;
+        if (alertCounter) {
+          alertCounter.textContent = activeAlerts;
+          alertCounter.style.display = activeAlerts > 0 ? 'inline-block' : 'none';
+        }
+      }
+
+      function showBanner(message, isError = false) {
+        if (!banner) return;
+        banner.textContent = message;
+        banner.className = `status-alert-banner ${isError ? 'banner-error' : 'banner-success'}`;
+        banner.style.display = 'block';
+        setTimeout(() => {
+          banner.style.display = 'none';
+        }, 4000);
+      }
+
+      function saveSettings() {
+        const speed = parseFloat(speedSelect.value);
+        const defPop = parseInt(defaultPopInput.value, 10);
+        const warnThresh = parseInt(warningInput.value, 10);
+        const dangerThresh = parseInt(dangerInput.value, 10);
+
+        // Validation
+        if (isNaN(defPop) || defPop < 0 || defPop > 150) {
+          showBanner('Error: Default population must be between 0 and 150 users.', true);
+          return;
+        }
+
+        if (isNaN(warnThresh) || warnThresh < 40 || warnThresh > 85) {
+          showBanner('Error: Warning threshold must be between 40% and 85%.', true);
+          return;
+        }
+
+        if (isNaN(dangerThresh) || dangerThresh < 75 || dangerThresh > 100) {
+          showBanner('Error: Congestion danger threshold must be between 75% and 100%.', true);
+          return;
+        }
+
+        if (warnThresh >= dangerThresh) {
+          showBanner('Error: High Load Warning threshold must be strictly lower than Congestion Danger threshold.', true);
+          return;
+        }
+
+        const newSettings = {
+          movementSpeed: speed,
+          defaultPopulation: defPop,
+          warningThreshold: warnThresh,
+          congestionThreshold: dangerThresh,
+          showCoverage: layerCoverage.checked,
+          showLabels: layerLabels.checked,
+          showRings: layerRings.checked,
+          showUsers: layerUsers.checked
+        };
+
+        CampusState.updateSettings(newSettings);
+        showBanner('✓ Settings successfully saved and applied to simulation engine.');
+      }
+
+      function resetDefaults() {
+        if (confirm('Reset all system settings and display preferences to factory defaults?')) {
+          const defaults = {
+            movementSpeed: 1.0,
+            defaultPopulation: 48,
+            congestionThreshold: 90,
+            warningThreshold: 70,
+            showCoverage: true,
+            showLabels: true,
+            showRings: true,
+            showUsers: true
+          };
+          CampusState.updateSettings(defaults);
+          loadCurrentSettings();
+          showBanner('✓ Restored all settings to factory defaults.');
+        }
+      }
+
+      document.getElementById('btn-save-settings')?.addEventListener('click', saveSettings);
+      document.getElementById('btn-save-settings-top')?.addEventListener('click', saveSettings);
+      document.getElementById('btn-reset-defaults')?.addEventListener('click', resetDefaults);
+
+      loadCurrentSettings();
+      CampusState.subscribe(loadCurrentSettings);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - Access Point Fleet Management">
+  <title>Access Point Management | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-chip {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .filter-chip:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+    .filter-chip.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--border-medium);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      min-width: 240px;
+    }
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+    .ap-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .ap-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all var(--transition-normal);
+    }
+    .ap-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-medium);
+    }
+    .ap-card.is-disabled {
+      background: #f8fafc;
+      opacity: 0.78;
+    }
+    .ap-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .ap-badge-id {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: var(--color-primary-subtle);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .ap-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .ap-card-loc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .capacity-editor {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .capacity-input {
+      width: 68px;
+      padding: 4px 8px;
+      font-size: 0.82rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-medium);
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item active">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">AD</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Administrator</div>
+            <div class="user-role-badge" id="user-profile-role">Admin Access</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Access Point Management</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+          <a href="digital-twin.html" class="btn btn-primary btn-sm">View on Campus Map ➔</a>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Access Point Fleet Management</h1>
+            <p>Monitor virtual AP operational states, adjust radio client capacities, and simulate equipment shutdowns.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-enable-all" class="btn btn-secondary btn-sm">Enable All APs</button>
+            <a href="digital-twin.html" class="btn btn-secondary btn-sm">Digital Twin</a>
+          </div>
+        </div>
+
+        <!-- Metric Summary Bar -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon icon-blue">📡</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Configured AP Fleet</span>
+              <div class="kpi-value" id="kpi-total-fleet">4</div>
+              <span class="kpi-subtext">802.11ax simulated cells</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-green">🟢</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Active / Broadcasting</span>
+              <div class="kpi-value" id="kpi-active-fleet">4 <span class="kpi-subvalue">/ 4</span></div>
+              <span class="kpi-subtext" id="kpi-online-rate">100% online fleet</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-purple">⚡</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Fleet Capacity</span>
+              <div class="kpi-value" id="kpi-total-capacity">130</div>
+              <span class="kpi-subtext">Simultaneous user slots</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-orange">⚠️</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Congested / Stressed</span>
+              <div class="kpi-value" id="kpi-congested-fleet">0</div>
+              <span class="kpi-subtext">Operating above 90% load</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Search & Filter Controls -->
+        <div class="filter-bar">
+          <div class="filter-group" id="status-filter-group">
+            <button class="filter-chip active" data-filter="all">All APs (4)</button>
+            <button class="filter-chip" data-filter="normal">Normal (&lt;70%)</button>
+            <button class="filter-chip" data-filter="warning">High Load (70-89%)</button>
+            <button class="filter-chip" data-filter="danger">Congested (&ge;90%)</button>
+            <button class="filter-chip" data-filter="disabled">Disabled</button>
+          </div>
+
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="ap-search-input" placeholder="Search by name, ID, or zone...">
+          </div>
+        </div>
+
+        <!-- Main Access Point Data Table -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Virtual Access Point Controllers</h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Real-time simulated association and capacity allocation</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>AP Identifier</th>
+                    <th>Friendly Name</th>
+                    <th>Campus Location</th>
+                    <th>Operational State</th>
+                    <th>Connected Clients</th>
+                    <th>Configured Capacity</th>
+                    <th>Load Ratio</th>
+                    <th style="text-align: right;">Fleet Controls</th>
+                  </tr>
+                </thead>
+                <tbody id="ap-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsive Card Grid View -->
+        <div class="page-title-group" style="margin-top: 10px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Access Point Detailed Cards</h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">Detailed card view with capacity adjustments and immediate radio toggles.</p>
+        </div>
+
+        <div class="ap-cards-grid" id="ap-cards-container">
+          <!-- Dynamically populated cards -->
+        </div>
+
+        <!-- Educational Simulation Model Notice -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-medium); margin-top: 10px;">
+          <div class="card-body" style="display: flex; gap: 14px; align-items: flex-start;">
+            <span style="font-size: 1.5rem;">💡</span>
+            <div>
+              <h3 style="font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Dynamic Association Architecture Note</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                Disabling an Access Point causes simulated client nodes to dynamically de-authenticate and associate with the nearest operational AP within distance limits. When all APs are disabled, clients enter an unassociated state with no wireless signal.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce authentication
+      const user = DemoAuth.requireAuth();
+      if (!user) return;
+
+      // Populate user profile in sidebar
+      const nameEl = document.getElementById('user-profile-name');
+      const roleEl = document.getElementById('user-profile-role');
+      const avatarEl = document.getElementById('user-profile-avatar');
+      if (nameEl) nameEl.textContent = user.name;
+      if (roleEl) roleEl.textContent = user.role;
+      if (avatarEl) avatarEl.textContent = user.avatar;
+
+      // Logout handler
+      document.getElementById('btn-logout')?.addEventListener('click', () => {
+        DemoAuth.logout();
+      });
+
+      // Filter and search state
+      let currentFilter = 'all';
+      let searchQuery = '';
+
+      // Elements
+      const tableBody = document.getElementById('ap-table-body');
+      const cardsContainer = document.getElementById('ap-cards-container');
+      const searchInput = document.getElementById('ap-search-input');
+      const filterChips = document.querySelectorAll('#status-filter-group .filter-chip');
+
+      // Filter chips click handling
+      filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          filterChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentFilter = chip.getAttribute('data-filter');
+          renderAccessPoints();
+        });
+      });
+
+      // Search input handling
+      searchInput?.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderAccessPoints();
+      });
+
+      // Enable All APs button
+      document.getElementById('btn-enable-all')?.addEventListener('click', () => {
+        const state = CampusState.getState();
+        state.accessPoints.forEach(ap => {
+          if (!ap.enabled) CampusState.toggleAp(ap.id);
+        });
+      });
+
+      function renderAccessPoints() {
+        const state = CampusState.getState();
+        const aps = state.accessPoints || [];
+
+        // Update alert counter in sidebar
+        const alertCounter = document.getElementById('nav-alert-counter');
+        const activeAlerts = state.alerts.filter(a => a.type === 'danger').length;
+        if (alertCounter) {
+          alertCounter.textContent = activeAlerts;
+          alertCounter.style.display = activeAlerts > 0 ? 'inline-block' : 'none';
+        }
+
+        // 1. Metric summary calculations
+        const totalFleet = aps.length;
+        const activeFleet = aps.filter(a => a.enabled).length;
+        const congestedFleet = aps.filter(a => a.enabled && a.status === 'danger').length;
+        const totalCap = aps.reduce((sum, a) => sum + (a.capacity || 0), 0);
+
+        document.getElementById('kpi-total-fleet').textContent = totalFleet;
+        document.getElementById('kpi-active-fleet').innerHTML = `${activeFleet} <span class="kpi-subvalue">/ ${totalFleet}</span>`;
+        document.getElementById('kpi-online-rate').textContent = totalFleet > 0 ? `${Math.round((activeFleet / totalFleet) * 100)}% operational` : '0%';
+        document.getElementById('kpi-total-capacity').textContent = totalCap;
+        document.getElementById('kpi-congested-fleet').textContent = congestedFleet;
+
+        // 2. Filter & Search APs
+        const filtered = aps.filter(ap => {
+          // Status filter
+          let matchStatus = true;
+          if (currentFilter === 'disabled') matchStatus = !ap.enabled;
+          else if (currentFilter === 'normal') matchStatus = ap.enabled && ap.status === 'normal';
+          else if (currentFilter === 'warning') matchStatus = ap.enabled && ap.status === 'warning';
+          else if (currentFilter === 'danger') matchStatus = ap.enabled && ap.status === 'danger';
+
+          // Search filter
+          let matchSearch = true;
+          if (searchQuery) {
+            matchSearch = ap.id.toLowerCase().includes(searchQuery) ||
+                          ap.name.toLowerCase().includes(searchQuery) ||
+                          ap.location.toLowerCase().includes(searchQuery);
+          }
+
+          return matchStatus && matchSearch;
+        });
+
+        // 3. Render Table Rows
+        if (tableBody) {
+          tableBody.innerHTML = '';
+          if (filtered.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 32px;">No access points match the selected criteria.</td></tr>`;
+          } else {
+            filtered.forEach(ap => {
+              const tr = document.createElement('tr');
+              let pillClass = 'pill-normal';
+              let statusLabel = 'Optimal (<70%)';
+
+              if (!ap.enabled) {
+                pillClass = 'pill-disabled';
+                statusLabel = 'Disabled';
+              } else if (ap.status === 'danger') {
+                pillClass = 'pill-danger';
+                statusLabel = 'Congested (≥90%)';
+              } else if (ap.status === 'warning') {
+                pillClass = 'pill-warning';
+                statusLabel = 'High Load (70-89%)';
+              }
+
+              const loadPct = ap.enabled ? `${ap.loadPercentage.toFixed(1)}%` : '0.0%';
+              const toggleBtnText = ap.enabled ? 'Disable AP' : 'Enable AP';
+              const toggleBtnClass = ap.enabled ? 'btn-danger' : 'btn-primary';
+
+              tr.innerHTML = `
+                <td><strong style="color: var(--color-primary);">${ap.id}</strong></td>
+                <td><strong style="color: var(--text-main);">${ap.name}</strong></td>
+                <td style="color: var(--text-secondary); font-size: 0.8rem;">${ap.location}</td>
+                <td><span class="status-pill ${pillClass}">${statusLabel}</span></td>
+                <td><strong style="font-size: 0.92rem;">${ap.connectedUsers}</strong> <span style="color: var(--text-muted); font-size: 0.75rem;">clients</span></td>
+                <td>
+                  <div class="capacity-editor">
+                    <input type="number" min="5" max="150" value="${ap.capacity}" class="capacity-input" data-ap-id="${ap.id}">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">max</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="min-width: 110px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
+                      <span>${loadPct}</span>
+                    </div>
+                    <div class="progress-bar-track">
+                      <div class="progress-bar-fill fill-${ap.status}" style="width: ${ap.enabled ? Math.min(ap.loadPercentage, 100) : 0}%;"></div>
+                    </div>
+                  </div>
+                </td>
+                <td style="text-align: right;">
+                  <button class="btn btn-sm ${toggleBtnClass} btn-toggle-ap" data-ap-id="${ap.id}">${toggleBtnText}</button>
+                </td>
+              `;
+              tableBody.appendChild(tr);
+            });
+          }
+        }
+
+        // 4. Render Responsive Cards Grid
+        if (cardsContainer) {
+          cardsContainer.innerHTML = '';
+          filtered.forEach(ap => {
+            const card = document.createElement('div');
+            card.className = `ap-card ${!ap.enabled ? 'is-disabled' : ''}`;
+
+            let pillClass = 'pill-normal';
+            let statusText = 'Normal (<70%)';
+            if (!ap.enabled) {
+              pillClass = 'pill-disabled';
+              statusText = 'OFFLINE / DISABLED';
+            } else if (ap.status === 'danger') {
+              pillClass = 'pill-danger';
+              statusText = 'CONGESTED (≥90%)';
+            } else if (ap.status === 'warning') {
+              pillClass = 'pill-warning';
+              statusText = 'HIGH LOAD (70-89%)';
+            }
+
+            const toggleBtnText = ap.enabled ? 'Turn Off / Disable' : 'Activate / Enable';
+            const toggleBtnClass = ap.enabled ? 'btn-danger' : 'btn-primary';
+
+            card.innerHTML = `
+              <div class="ap-card-header">
+                <div>
+                  <span class="ap-badge-id">${ap.id}</span>
+                  <div class="ap-card-title">${ap.name}</div>
+                  <div class="ap-card-loc">${ap.location}</div>
+                </div>
+                <span class="status-pill ${pillClass}">${statusText}</span>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                  <span style="color: var(--text-muted);">Current Load</span>
+                  <strong>${ap.enabled ? ap.loadPercentage.toFixed(1) + '%' : 'Inactive'}</strong>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill fill-${ap.status}" style="width: ${ap.enabled ? Math.min(ap.loadPercentage, 100) : 0}%;"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+                <div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Connected Clients</div>
+                  <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-main);">${ap.connectedUsers}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Max Capacity</div>
+                  <div class="capacity-editor" style="justify-content: flex-end;">
+                    <input type="number" min="5" max="150" value="${ap.capacity}" class="capacity-input" data-ap-id="${ap.id}">
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <a href="digital-twin.html" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;">Locate on Map</a>
+                <button class="btn btn-sm ${toggleBtnClass} btn-toggle-ap" style="flex: 1; justify-content: center;" data-ap-id="${ap.id}">${toggleBtnText}</button>
+              </div>
+            `;
+            cardsContainer.appendChild(card);
+          });
+        }
+
+        // Attach event listeners for toggle and capacity inputs
+        attachInteractiveListeners();
+      }
+
+      function attachInteractiveListeners() {
+        // Toggle AP buttons
+        document.querySelectorAll('.btn-toggle-ap').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const apId = e.currentTarget.getAttribute('data-ap-id');
+            if (apId) {
+              CampusState.toggleAp(apId);
+            }
+          });
+        });
+
+        // Capacity Inputs
+        document.querySelectorAll('.capacity-input').forEach(input => {
+          input.addEventListener('change', (e) => {
+            const apId = e.currentTarget.getAttribute('data-ap-id');
+            const val = parseInt(e.currentTarget.value, 10);
+            if (apId && !isNaN(val) && val >= 5 && val <= 200) {
+              CampusState.updateApCapacity(apId, val);
+            } else {
+              alert('Please enter a valid capacity between 5 and 200 users.');
+              renderAccessPoints();
+            }
+          });
+        });
+      }
+
+      // Initial Render & Subscribe
+      renderAccessPoints();
+      CampusState.subscribe(renderAccessPoints);
+    });
+  </script>
+</body>
+</html>

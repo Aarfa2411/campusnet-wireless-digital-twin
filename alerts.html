@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - Real-time Network Alerts and Activity Logs">
+  <title>Alerts &amp; Activity Logs | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-chip {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .filter-chip:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+    .filter-chip.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--border-medium);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      min-width: 260px;
+    }
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+    .alert-row-danger {
+      background-color: #fef2f2 !important;
+    }
+    .alert-row-warning {
+      background-color: #fffbeb !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item active">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">AD</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Administrator</div>
+            <div class="user-role-badge" id="user-profile-role">Admin Access</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Alerts &amp; Activity Logs</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+          <button id="btn-clear-logs" class="btn btn-secondary btn-sm">Clear Log History</button>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Alerts &amp; Activity Log Audit Trail</h1>
+            <p>Chronological feed of capacity saturation alerts, equipment power events, configuration changes, and physics resets.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-export-log-csv" class="btn btn-primary btn-sm">Download Log CSV</button>
+          </div>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon icon-blue">📋</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Recorded Events</span>
+              <div class="kpi-value" id="kpi-total-alerts">0</div>
+              <span class="kpi-subtext">Total active audit entries</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-orange">🚨</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Congestion Warnings</span>
+              <div class="kpi-value" id="kpi-danger-alerts">0</div>
+              <span class="kpi-subtext">AP load &ge; 90% threshold</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-purple">⚠️</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Load Advisories</span>
+              <div class="kpi-value" id="kpi-warning-alerts">0</div>
+              <span class="kpi-subtext">AP load 70% to 89%</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-green">ℹ️</div>
+            <div class="kpi-body">
+              <span class="kpi-label">System Operations</span>
+              <div class="kpi-value" id="kpi-info-alerts">0</div>
+              <span class="kpi-subtext">Lifecycle &amp; user adjustments</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="filter-bar">
+          <div class="filter-group" id="severity-filter-group">
+            <button class="filter-chip active" data-severity="all">All Entries</button>
+            <button class="filter-chip" data-severity="danger">Congestion (Danger)</button>
+            <button class="filter-chip" data-severity="warning">Advisory (Warning)</button>
+            <button class="filter-chip" data-severity="info">System Info</button>
+          </div>
+
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="log-search-input" placeholder="Search logs by AP, message, timestamp...">
+          </div>
+        </div>
+
+        <!-- Main Activity Logs Table Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Event Audit Trail</h2>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Real-time chronological events recorded during simulation</span>
+            </div>
+            <span style="font-size: 0.78rem; color: var(--text-muted);" id="table-showing-count">Showing 0 entries</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px;">Timestamp</th>
+                    <th style="width: 110px;">Severity</th>
+                    <th style="width: 130px;">Related Target</th>
+                    <th>Event Description</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Disclosure Card -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-medium);">
+          <div class="card-body" style="display: flex; gap: 14px; align-items: flex-start;">
+            <span style="font-size: 1.5rem;">🔔</span>
+            <div>
+              <h3 style="font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Auditing Engine Mechanism</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                Alert deduplication prevents repetitive logs on every animation frame. Congestion events are captured when an access point crosses above 90% load capacity, and resolution events are logged when demand falls back to safe operational boundaries.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce authentication
+      const user = DemoAuth.requireAuth();
+      if (!user) return;
+
+      // Populate user profile
+      const nameEl = document.getElementById('user-profile-name');
+      const roleEl = document.getElementById('user-profile-role');
+      const avatarEl = document.getElementById('user-profile-avatar');
+      if (nameEl) nameEl.textContent = user.name;
+      if (roleEl) roleEl.textContent = user.role;
+      if (avatarEl) avatarEl.textContent = user.avatar;
+
+      // Logout handler
+      document.getElementById('btn-logout')?.addEventListener('click', () => {
+        DemoAuth.logout();
+      });
+
+      // Filtering state
+      let currentSeverity = 'all';
+      let searchQuery = '';
+
+      // Elements
+      const tableBody = document.getElementById('logs-table-body');
+      const searchInput = document.getElementById('log-search-input');
+      const filterChips = document.querySelectorAll('#severity-filter-group .filter-chip');
+      const showingCountEl = document.getElementById('table-showing-count');
+
+      // Filter clicks
+      filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          filterChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentSeverity = chip.getAttribute('data-severity');
+          renderLogs();
+        });
+      });
+
+      // Search input
+      searchInput?.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderLogs();
+      });
+
+      // Clear logs button
+      document.getElementById('btn-clear-logs')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear the activity log history?')) {
+          CampusState.clearAlerts();
+        }
+      });
+
+      // Download Log CSV button
+      document.getElementById('btn-export-log-csv')?.addEventListener('click', () => {
+        const state = CampusState.getState();
+        let csv = 'Timestamp,Date,Severity,Target AP,Message\n';
+        state.alerts.forEach(al => {
+          csv += `"${al.timestamp}","${al.date || ''}","${al.type.toUpperCase()}","${al.apId}","${al.message.replace(/"/g, '""')}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `CampusNet_AlertLogs_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
+
+      function renderLogs() {
+        const state = CampusState.getState();
+        const alerts = state.alerts || [];
+
+        // Update alert counter in sidebar
+        const alertCounter = document.getElementById('nav-alert-counter');
+        const activeAlerts = alerts.filter(a => a.type === 'danger').length;
+        if (alertCounter) {
+          alertCounter.textContent = activeAlerts;
+          alertCounter.style.display = activeAlerts > 0 ? 'inline-block' : 'none';
+        }
+
+        // Summary KPI counts
+        const dangerCount = alerts.filter(a => a.type === 'danger').length;
+        const warningCount = alerts.filter(a => a.type === 'warning').length;
+        const infoCount = alerts.filter(a => a.type === 'info').length;
+
+        document.getElementById('kpi-total-alerts').textContent = alerts.length;
+        document.getElementById('kpi-danger-alerts').textContent = dangerCount;
+        document.getElementById('kpi-warning-alerts').textContent = warningCount;
+        document.getElementById('kpi-info-alerts').textContent = infoCount;
+
+        // Filter and Search
+        const filtered = alerts.filter(al => {
+          let matchSeverity = true;
+          if (currentSeverity !== 'all') {
+            matchSeverity = al.type === currentSeverity;
+          }
+
+          let matchSearch = true;
+          if (searchQuery) {
+            matchSearch = al.message.toLowerCase().includes(searchQuery) ||
+                          al.apId.toLowerCase().includes(searchQuery) ||
+                          al.timestamp.toLowerCase().includes(searchQuery);
+          }
+
+          return matchSeverity && matchSearch;
+        });
+
+        if (showingCountEl) {
+          showingCountEl.textContent = `Showing ${filtered.length} of ${alerts.length} entries`;
+        }
+
+        if (tableBody) {
+          tableBody.innerHTML = '';
+          if (filtered.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">No recorded events match the selected criteria.</td></tr>`;
+          } else {
+            filtered.forEach(al => {
+              const tr = document.createElement('tr');
+              let pillClass = 'pill-normal';
+              let rowHighlight = '';
+
+              if (al.type === 'danger') {
+                pillClass = 'pill-danger';
+                rowHighlight = 'alert-row-danger';
+              } else if (al.type === 'warning') {
+                pillClass = 'pill-warning';
+                rowHighlight = 'alert-row-warning';
+              }
+
+              tr.className = rowHighlight;
+              tr.innerHTML = `
+                <td style="color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap;">
+                  <strong>${al.timestamp}</strong>
+                  ${al.date ? `<div style="font-size: 0.7rem; color: var(--text-muted);">${al.date}</div>` : ''}
+                </td>
+                <td><span class="status-pill ${pillClass}">${al.type.toUpperCase()}</span></td>
+                <td><strong style="color: var(--color-primary);">${al.apId}</strong></td>
+                <td style="color: var(--text-main); line-height: 1.4;">${al.message}</td>
+              `;
+              tableBody.appendChild(tr);
+            });
+          }
+        }
+      }
+
+      renderLogs();
+      CampusState.subscribe(renderLogs);
+    });
+  </script>
+</body>
+</html>

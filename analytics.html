@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - Analytics and Performance Reports">
+  <title>Analytics &amp; Reports | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .analytics-grid-two {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .metric-hero-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .metric-hero-stat {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e40af;
+      line-height: 1.1;
+    }
+    .stat-distribution-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .dist-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .dist-row-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .dist-pill {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item active">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">AD</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Administrator</div>
+            <div class="user-role-badge" id="user-profile-role">Admin Access</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Analytics &amp; Reports</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+          <button id="btn-download-csv" class="btn btn-primary btn-sm">
+            <span>📥 Download Report (CSV)</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Network Analytics &amp; Performance Telemetry</h1>
+            <p>Aggregated radio frequency health distributions, fleet load comparisons, and comprehensive simulation report generation.</p>
+          </div>
+          <div>
+            <button id="btn-download-csv-top" class="btn btn-primary btn-sm">Download CSV Report</button>
+          </div>
+        </div>
+
+        <!-- Metric Highlight Banner -->
+        <div class="metric-hero-box">
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.05em;">Composite Network Quality Index</span>
+            <div class="metric-hero-stat" id="metric-health-score">85%</div>
+            <p style="font-size: 0.85rem; color: #1e40af; margin-top: 4px;" id="metric-health-desc">Optimal coverage: 75% of clients in strong or medium signal zones.</p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.78rem; color: #3b82f6; font-weight: 600;">Overall Fleet Capacity</div>
+            <div style="font-size: 1.4rem; font-weight: 700; color: #1e3a8a;" id="metric-fleet-cap-util">48 / 130</div>
+            <span style="font-size: 0.75rem; color: #60a5fa;" id="metric-fleet-cap-pct">(36.9% capacity utilized)</span>
+          </div>
+        </div>
+
+        <!-- Analytics Grid: Signal Quality & AP Load Comparison -->
+        <div class="analytics-grid-two">
+          <!-- Signal Quality Distribution Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Signal Quality Distribution</h2>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">Proximity-based signal tier allocations</span>
+              </div>
+              <span class="status-pill pill-normal">Simulated RF</span>
+            </div>
+            <div class="card-body">
+              <div class="stat-distribution-list">
+                <!-- Strong Signal -->
+                <div class="dist-row">
+                  <div class="dist-row-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="status-indicator-dot dot-normal"></span>
+                      <span>Strong Signal (d &le; 110 units)</span>
+                    </div>
+                    <span id="stat-strong-count">28 clients (58%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill fill-normal" id="stat-strong-bar" style="width: 58%;"></div>
+                  </div>
+                </div>
+
+                <!-- Medium Signal -->
+                <div class="dist-row">
+                  <div class="dist-row-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="status-indicator-dot dot-warning"></span>
+                      <span>Medium Signal (110 &lt; d &le; 210 units)</span>
+                    </div>
+                    <span id="stat-medium-count">15 clients (31%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill fill-warning" id="stat-medium-bar" style="width: 31%;"></div>
+                  </div>
+                </div>
+
+                <!-- Weak Signal -->
+                <div class="dist-row">
+                  <div class="dist-row-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="status-indicator-dot dot-danger"></span>
+                      <span>Weak / Cell Edge (d &gt; 210 units)</span>
+                    </div>
+                    <span id="stat-weak-count">5 clients (11%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill fill-danger" id="stat-weak-bar" style="width: 11%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+                <strong>Simulation Note:</strong> Signal categories are derived mathematically using Euclidean distance from each simulated client to its nearest active Access Point:
+                <code>d = &radic;((x - ap_x)&sup2; + (y - ap_y)&sup2;)</code>.
+              </div>
+            </div>
+          </div>
+
+          <!-- AP Load Comparison Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Access Point Load Comparison</h2>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">Capacity saturation across campus zones</span>
+              </div>
+              <span class="status-pill pill-normal">4 Nodes</span>
+            </div>
+            <div class="card-body">
+              <div class="stat-distribution-list" id="analytics-ap-bars">
+                <!-- Dynamically populated -->
+              </div>
+
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; font-size: 0.78rem;">
+                <span style="color: var(--text-muted);">Normal: &lt;70%</span>
+                <span style="color: var(--color-warning);">High Load: 70% to 89%</span>
+                <span style="color: var(--color-danger);">Congested: &ge;90%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access Point Summary Analytics Table -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Telemetry Data Log</h2>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Exportable performance metrics from current session</span>
+            </div>
+            <button id="btn-export-table" class="btn btn-secondary btn-sm">Export CSV</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Access Point</th>
+                    <th>Zone / Location</th>
+                    <th>Status</th>
+                    <th>Current Users</th>
+                    <th>Capacity Limit</th>
+                    <th>Utilization Rate</th>
+                    <th>Signal Quality Mix</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Disclosure Card -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-medium);">
+          <div class="card-body" style="display: flex; gap: 14px; align-items: flex-start;">
+            <span style="font-size: 1.5rem;">📊</span>
+            <div>
+              <h3 style="font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Data Authenticity &amp; Reporting Scope</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                All metrics presented in this analytics view reflect the active browser-side simulation state stored in <code>localStorage</code>. No external or synthetic server telemetry is manufactured. The exported CSV report is formatted specifically for evaluation in spreadsheet software like Microsoft Excel or Google Sheets.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce authentication
+      const user = DemoAuth.requireAuth();
+      if (!user) return;
+
+      // Populate user profile
+      const nameEl = document.getElementById('user-profile-name');
+      const roleEl = document.getElementById('user-profile-role');
+      const avatarEl = document.getElementById('user-profile-avatar');
+      if (nameEl) nameEl.textContent = user.name;
+      if (roleEl) roleEl.textContent = user.role;
+      if (avatarEl) avatarEl.textContent = user.avatar;
+
+      // Logout handler
+      document.getElementById('btn-logout')?.addEventListener('click', () => {
+        DemoAuth.logout();
+      });
+
+      // CSV Export triggers
+      const handleCsvDownload = () => {
+        const csvContent = CampusState.generateReportCSV();
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `CampusNet_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      };
+
+      document.getElementById('btn-download-csv')?.addEventListener('click', handleCsvDownload);
+      document.getElementById('btn-download-csv-top')?.addEventListener('click', handleCsvDownload);
+      document.getElementById('btn-export-table')?.addEventListener('click', handleCsvDownload);
+
+      function renderAnalytics() {
+        const state = CampusState.getState();
+        const users = state.users || [];
+        const aps = state.accessPoints || [];
+
+        // Update alert counter in sidebar
+        const alertCounter = document.getElementById('nav-alert-counter');
+        const activeAlerts = state.alerts.filter(a => a.type === 'danger').length;
+        if (alertCounter) {
+          alertCounter.textContent = activeAlerts;
+          alertCounter.style.display = activeAlerts > 0 ? 'inline-block' : 'none';
+        }
+
+        // 1. Signal tier breakdown
+        const strongUsers = users.filter(u => u.signalCategory === 'strong').length;
+        const mediumUsers = users.filter(u => u.signalCategory === 'medium').length;
+        const weakUsers = users.filter(u => u.signalCategory === 'weak').length;
+        const totalUsers = users.length;
+
+        const strongPct = totalUsers > 0 ? ((strongUsers / totalUsers) * 100).toFixed(1) : '0.0';
+        const mediumPct = totalUsers > 0 ? ((mediumUsers / totalUsers) * 100).toFixed(1) : '0.0';
+        const weakPct = totalUsers > 0 ? ((weakUsers / totalUsers) * 100).toFixed(1) : '0.0';
+
+        document.getElementById('stat-strong-count').textContent = `${strongUsers} clients (${strongPct}%)`;
+        document.getElementById('stat-strong-bar').style.width = `${strongPct}%`;
+
+        document.getElementById('stat-medium-count').textContent = `${mediumUsers} clients (${mediumPct}%)`;
+        document.getElementById('stat-medium-bar').style.width = `${mediumPct}%`;
+
+        document.getElementById('stat-weak-count').textContent = `${weakUsers} clients (${weakPct}%)`;
+        document.getElementById('stat-weak-bar').style.width = `${weakPct}%`;
+
+        // 2. Health score
+        const activeApsCount = aps.filter(a => a.enabled).length;
+        const avgScore = totalUsers > 0 && activeApsCount > 0
+          ? Math.round(((strongUsers * 1.0 + mediumUsers * 0.7 + weakUsers * 0.3) / totalUsers) * 100)
+          : 0;
+
+        document.getElementById('metric-health-score').textContent = `${avgScore}%`;
+        let healthDesc = 'Optimal wireless quality: users are within reliable radio distance.';
+        if (avgScore < 50) healthDesc = 'Degraded network performance: high proportion of clients on cell edges.';
+        else if (avgScore < 75) healthDesc = 'Moderate network performance: acceptable signal distribution.';
+        if (activeApsCount === 0) healthDesc = 'Fleet Offline: all access points are currently disabled.';
+        document.getElementById('metric-health-desc').textContent = healthDesc;
+
+        // Fleet Capacity
+        const totalCapacity = aps.reduce((sum, a) => sum + (a.capacity || 0), 0);
+        document.getElementById('metric-fleet-cap-util').textContent = `${totalUsers} / ${totalCapacity}`;
+        const capPct = totalCapacity > 0 ? ((totalUsers / totalCapacity) * 100).toFixed(1) : '0.0';
+        document.getElementById('metric-fleet-cap-pct').textContent = `(${capPct}% fleet capacity utilized)`;
+
+        // 3. AP Load Bars
+        const apBarsContainer = document.getElementById('analytics-ap-bars');
+        if (apBarsContainer) {
+          apBarsContainer.innerHTML = '';
+          aps.forEach(ap => {
+            const row = document.createElement('div');
+            row.className = 'dist-row';
+
+            let pillClass = 'pill-normal';
+            let fillClass = 'fill-normal';
+            if (!ap.enabled) {
+              pillClass = 'pill-disabled';
+              fillClass = 'fill-disabled';
+            } else if (ap.status === 'danger') {
+              pillClass = 'pill-danger';
+              fillClass = 'fill-danger';
+            } else if (ap.status === 'warning') {
+              pillClass = 'pill-warning';
+              fillClass = 'fill-warning';
+            }
+
+            const loadPct = ap.enabled ? `${ap.loadPercentage.toFixed(1)}%` : 'DISABLED';
+            const barWidth = ap.enabled ? Math.min(ap.loadPercentage, 100) : 0;
+
+            row.innerHTML = `
+              <div class="dist-row-header">
+                <div>
+                  <strong>${ap.id}</strong> — <span style="color: var(--text-secondary);">${ap.name}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">${ap.connectedUsers} / ${ap.capacity}</span>
+                  <span class="status-pill ${pillClass}" style="padding: 1px 6px; font-size: 0.65rem;">${loadPct}</span>
+                </div>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill ${fillClass}" style="width: ${barWidth}%;"></div>
+              </div>
+            `;
+            apBarsContainer.appendChild(row);
+          });
+        }
+
+        // 4. Analytics Data Table
+        const tbody = document.getElementById('analytics-table-body');
+        if (tbody) {
+          tbody.innerHTML = '';
+          aps.forEach(ap => {
+            const tr = document.createElement('tr');
+            let pillClass = 'pill-normal';
+            let statusLabel = 'Optimal (<70%)';
+            if (!ap.enabled) {
+              pillClass = 'pill-disabled';
+              statusLabel = 'Disabled';
+            } else if (ap.status === 'danger') {
+              pillClass = 'pill-danger';
+              statusLabel = 'Congested (≥90%)';
+            } else if (ap.status === 'warning') {
+              pillClass = 'pill-warning';
+              statusLabel = 'High Load (70-89%)';
+            }
+
+            // Calculate signal mix for users connected to this AP
+            const apUsers = users.filter(u => u.apId === ap.id);
+            const apStrong = apUsers.filter(u => u.signalCategory === 'strong').length;
+            const apMed = apUsers.filter(u => u.signalCategory === 'medium').length;
+            const apWeak = apUsers.filter(u => u.signalCategory === 'weak').length;
+
+            tr.innerHTML = `
+              <td><strong>${ap.id}</strong> (${ap.name})</td>
+              <td style="color: var(--text-secondary); font-size: 0.8rem;">${ap.location}</td>
+              <td><span class="status-pill ${pillClass}">${statusLabel}</span></td>
+              <td><strong>${ap.connectedUsers}</strong></td>
+              <td>${ap.capacity}</td>
+              <td><strong>${ap.enabled ? ap.loadPercentage.toFixed(1) + '%' : 'N/A'}</strong></td>
+              <td style="font-size: 0.75rem; color: var(--text-secondary);">
+                ${ap.enabled && apUsers.length > 0 ? `🟢 ${apStrong} | 🟡 ${apMed} | 🔴 ${apWeak}` : '<span style="color: var(--text-muted);">None</span>'}
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      }
+
+      renderAnalytics();
+      CampusState.subscribe(renderAnalytics);
+    });
+  </script>
+</body>
+</html>

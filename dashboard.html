@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CampusNet Smart Campus Wireless Digital Twin - Network Operations Overview Dashboard">
+  <title>Overview Dashboard | CampusNet Digital Twin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Persistent Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-app-name">CampusNet</span>
+          <span class="brand-app-tag">Wireless Digital Twin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="dashboard.html" class="nav-item active">
+          <span class="nav-icon">📊</span>
+          <span>Overview Dashboard</span>
+        </a>
+        <a href="digital-twin.html" class="nav-item">
+          <span class="nav-icon">🗺️</span>
+          <span>Campus Digital Twin</span>
+        </a>
+        <a href="access-points.html" class="nav-item">
+          <span class="nav-icon">📡</span>
+          <span>AP Management</span>
+        </a>
+
+        <div class="nav-section-title">Monitoring &amp; Reports</div>
+        <a href="analytics.html" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span>Analytics &amp; Reports</span>
+        </a>
+        <a href="alerts.html" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts &amp; Activity Logs</span>
+          <span class="nav-badge nav-badge-alert" id="nav-alert-counter">0</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>System Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card-compact">
+          <div class="user-avatar" id="user-profile-avatar">SJ</div>
+          <div class="user-info-text">
+            <div class="user-name" id="user-profile-name">Dr. Sarah Jenkins</div>
+            <div class="user-role-badge" id="user-profile-role">Administrator</div>
+          </div>
+          <button id="btn-logout" class="btn-sidebar-logout" title="Sign out of demo session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content -->
+    <div class="app-viewport">
+      <!-- Top Navigation Header -->
+      <header class="top-navbar">
+        <div class="breadcrumb-group">
+          <span class="breadcrumb-root">CampusNet</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Overview Dashboard</span>
+        </div>
+
+        <div class="top-actions-group">
+          <div class="header-disclosure">
+            <span><strong>Simulation Mode:</strong> Generated educational data</span>
+          </div>
+          <a href="digital-twin.html" class="btn btn-primary btn-sm">Open Digital Twin Map ➔</a>
+        </div>
+      </header>
+
+      <!-- Main Page Content Body -->
+      <main class="page-container">
+        <!-- Page Title & Header Actions -->
+        <div class="page-header-row">
+          <div class="page-title-group">
+            <h1>Campus Network Overview</h1>
+            <p>Real-time simulated wireless health, capacity allocation, and congestion metrics across campus grounds.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="access-points.html" class="btn btn-secondary btn-sm">Manage APs</a>
+            <a href="analytics.html" class="btn btn-secondary btn-sm">View Analytics</a>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards (Derived dynamically from shared state) -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon icon-blue">👥</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Simulated Clients</span>
+              <div class="kpi-value" id="kpi-total-users">48</div>
+              <span class="kpi-subtext" id="kpi-users-subtext">Active student &amp; faculty nodes</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-green">📡</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Active Access Points</span>
+              <div class="kpi-value" id="kpi-active-aps">4 <span class="kpi-subvalue">/ 4</span></div>
+              <span class="kpi-subtext" id="kpi-aps-subtext"><span class="status-indicator-dot dot-normal"></span> 100% online fleet</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-purple">📶</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Average Signal Health</span>
+              <div class="kpi-value" id="kpi-avg-signal">Optimal <span class="kpi-score">(82%)</span></div>
+              <span class="kpi-subtext" id="kpi-signal-subtext">Strong: 28 | Med: 15 | Weak: 5</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon icon-amber">⚠️</div>
+            <div class="kpi-body">
+              <span class="kpi-label">Congestion Incidents</span>
+              <div class="kpi-value" id="kpi-congestion-count">0 Congested</div>
+              <span class="kpi-subtext" id="kpi-congestion-subtext">All active APs within limits</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts & Health Section: Signal Distribution & AP Load Comparisons -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <!-- Signal Distribution Visual Breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Signal Quality Distribution</h2>
+              <span class="badge badge-subtle">Euclidean Distance Model</span>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                    <span><strong style="color: var(--color-normal);">● Strong Signal</strong> (&le; 110 units)</span>
+                    <span id="chart-strong-val">0 users (0%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div id="chart-strong-bar" class="progress-bar-fill fill-normal" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                    <span><strong style="color: var(--color-warning);">● Medium Signal</strong> (111–210 units)</span>
+                    <span id="chart-medium-val">0 users (0%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div id="chart-medium-bar" class="progress-bar-fill fill-warning" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                    <span><strong style="color: var(--color-danger);">● Weak Signal</strong> (&gt; 210 units)</span>
+                    <span id="chart-weak-val">0 users (0%)</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div id="chart-weak-bar" class="progress-bar-fill fill-danger" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div style="font-size: 0.75rem; color: var(--text-muted); background: #f8fafc; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+                  💡 Signal category is determined dynamically based on distance to the nearest active AP.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Access Point Load Comparison -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Access Point Capacity Load</h2>
+              <a href="access-points.html" style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">View All APs ➔</a>
+            </div>
+            <div class="card-body">
+              <div id="dashboard-ap-bars" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Dynamically generated AP load comparison bars -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Launch Actions Banner -->
+        <div class="card" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: #bfdbfe;">
+          <div class="card-body" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div>
+              <h3 style="font-size: 1.1rem; color: var(--text-main); font-weight: 700; margin-bottom: 4px;">Interactive Campus Digital Twin Viewport</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 650px;">
+                Launch the 900 × 550 vector campus map to observe simulated crowd wandering, test access point failover, and view live concentric coverage rings.
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <a href="digital-twin.html" class="btn btn-primary">Open Campus Map</a>
+              <a href="analytics.html" class="btn btn-secondary">Export Simulation CSV</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Network Events & Alerts Table -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Network Activity &amp; Incidents</h2>
+            <a href="alerts.html" style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">View Full Activity Log ➔</a>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Type</th>
+                    <th>Source / Target</th>
+                    <th>Event Description</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-events-tbody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="shared-state.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Protect page with demo session check
+    DemoAuth.requireAuth();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      function renderDashboard() {
+        const state = CampusState.getState();
+        const aps = state.accessPoints;
+        const users = state.users;
+
+        // 1. KPI Cards
+        const totalUsersEl = document.getElementById('kpi-total-users');
+        const activeApsEl = document.getElementById('kpi-active-aps');
+        const avgSignalEl = document.getElementById('kpi-avg-signal');
+        const congestionEl = document.getElementById('kpi-congestion-count');
+        const alertBadge = document.getElementById('nav-alert-counter');
+
+        if (totalUsersEl) totalUsersEl.textContent = users.length;
+
+        const enabledCount = aps.filter(a => a.enabled).length;
+        if (activeApsEl) activeApsEl.innerHTML = `${enabledCount} <span class="kpi-subvalue">/ ${aps.length}</span>`;
+
+        // Signal Breakdown
+        const strongCount = users.filter(u => u.signalCategory === 'strong').length;
+        const mediumCount = users.filter(u => u.signalCategory === 'medium').length;
+        const weakCount = users.filter(u => u.signalCategory === 'weak').length;
+
+        if (avgSignalEl) {
+          if (users.length === 0 || enabledCount === 0) {
+            avgSignalEl.innerHTML = enabledCount === 0 && users.length > 0 ? 'Unavailable <span class="kpi-score" style="color:var(--color-danger);">(0%)</span>' : 'N/A <span class="kpi-subvalue">(0 users)</span>';
+          } else {
+            const score = Math.round(((strongCount * 1.0 + mediumCount * 0.7 + weakCount * 0.3) / users.length) * 100);
+            let tag = 'Optimal';
+            let color = 'var(--color-normal)';
+            if (score < 50) { tag = 'Degraded'; color = 'var(--color-danger)'; }
+            else if (score < 75) { tag = 'Good'; color = 'var(--color-warning)'; }
+            avgSignalEl.innerHTML = `${tag} <span class="kpi-score" style="color:${color}">(${score}%)</span>`;
+          }
+        }
+
+        const signalSubtext = document.getElementById('kpi-signal-subtext');
+        if (signalSubtext) signalSubtext.textContent = `Strong: ${strongCount} | Med: ${mediumCount} | Weak: ${weakCount}`;
+
+        // Congestion Incidents
+        const congestedAps = aps.filter(a => a.enabled && a.status === 'danger');
+        const warningAps = aps.filter(a => a.enabled && a.status === 'warning');
+
+        if (congestionEl) {
+          if (congestedAps.length > 0) {
+            congestionEl.textContent = `${congestedAps.length} Congested`;
+            congestionEl.style.color = 'var(--color-danger)';
+          } else if (warningAps.length > 0) {
+            congestionEl.textContent = `${warningAps.length} High Load`;
+            congestionEl.style.color = 'var(--color-warning)';
+          } else {
+            congestionEl.textContent = '0 Congested';
+            congestionEl.style.color = 'var(--text-main)';
+          }
+        }
+
+        if (alertBadge) {
+          alertBadge.textContent = congestedAps.length + warningAps.length;
+        }
+
+        // 2. Signal Distribution Chart
+        const total = users.length || 1;
+        const strongPct = Math.round((strongCount / total) * 100);
+        const mediumPct = Math.round((mediumCount / total) * 100);
+        const weakPct = Math.round((weakCount / total) * 100);
+
+        document.getElementById('chart-strong-val').textContent = `${strongCount} users (${strongPct}%)`;
+        document.getElementById('chart-strong-bar').style.width = `${strongPct}%`;
+
+        document.getElementById('chart-medium-val').textContent = `${mediumCount} users (${mediumPct}%)`;
+        document.getElementById('chart-medium-bar').style.width = `${mediumPct}%`;
+
+        document.getElementById('chart-weak-val').textContent = `${weakCount} users (${weakPct}%)`;
+        document.getElementById('chart-weak-bar').style.width = `${weakPct}%`;
+
+        // 3. AP Load Comparison Bars
+        const apBarsContainer = document.getElementById('dashboard-ap-bars');
+        if (apBarsContainer) {
+          apBarsContainer.innerHTML = '';
+          aps.forEach(ap => {
+            const row = document.createElement('div');
+            let pillClass = 'pill-normal';
+            let fillClass = 'fill-normal';
+
+            if (!ap.enabled) {
+              pillClass = 'pill-disabled';
+              fillClass = 'fill-disabled';
+            } else if (ap.status === 'danger') {
+              pillClass = 'pill-danger';
+              fillClass = 'fill-danger';
+            } else if (ap.status === 'warning') {
+              pillClass = 'pill-warning';
+              fillClass = 'fill-warning';
+            }
+
+            const visualWidth = ap.enabled ? Math.min(ap.loadPercentage, 100).toFixed(1) : 0;
+            const displayLoad = ap.enabled ? `${ap.loadPercentage.toFixed(1)}%` : 'DISABLED';
+
+            row.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 4px;">
+                <span style="font-weight: 600;">${ap.id}: ${ap.name}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="color: var(--text-muted); font-size: 0.72rem;">${ap.connectedUsers} / ${ap.capacity} users</span>
+                  <span class="status-pill ${pillClass}" style="padding: 1px 6px; font-size: 0.65rem;">${displayLoad}</span>
+                </div>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill ${fillClass}" style="width: ${visualWidth}%;"></div>
+              </div>
+            `;
+            apBarsContainer.appendChild(row);
+          });
+        }
+
+        // 4. Recent Events Table (first 5 alerts)
+        const tbody = document.getElementById('dashboard-events-tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          const recentAlerts = state.alerts.slice(0, 5);
+          if (recentAlerts.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">No recent events recorded yet.</td></tr>`;
+          } else {
+            recentAlerts.forEach(al => {
+              const tr = document.createElement('tr');
+              let pillClass = 'pill-normal';
+              if (al.type === 'danger') pillClass = 'pill-danger';
+              if (al.type === 'warning') pillClass = 'pill-warning';
+
+              tr.innerHTML = `
+                <td style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap;">${al.timestamp}</td>
+                <td><span class="status-pill ${pillClass}" style="padding: 1px 6px; font-size: 0.65rem;">${al.type.toUpperCase()}</span></td>
+                <td><strong>${al.apId}</strong></td>
+                <td>${al.message}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        }
+      }
+
+      renderDashboard();
+      CampusState.subscribe(renderDashboard);
+    });
+  </script>
+</body>
+</html>
