@@ -5,6 +5,8 @@ A multi-page, light-theme Smart Campus Wireless Network Management System featur
 > **Simulation Disclosure:**  
 > **Simulation Mode:** All client locations, signal categories, traffic loads, and telemetry data are simulated for educational evaluation and system planning. No real Wi-Fi measurements are collected, and no connections to physical hardware routers are made.
 
+**Live Demo** : https://campusnet-wireless-digital-twin.vercel.app/
+
 ---
 
 ## 1. System Overview & Architecture
